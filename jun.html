@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let cart = [];
+      let library = [
+        {
+          id: 1,
+          name: "Đắc nhân tâm",
+          price: 100000,
+          quantity: 15,
+          category: "Tâm lý",
+        },
+        {
+          id: 2,
+          name: "Hồn Loàn",
+          price: 50000,
+          quantity: 20,
+          category: "Tâm lý",
+        },
+        {
+          id: 3,
+          name: "Hoàn Lồn",
+          price: 70000,
+          quantity: 24,
+          category: "Thần kinh",
+        },
+      ];
+      function displayLibrary() {
+        let category = prompt("Nhập danh mục muốn xem").toLowerCase();
+        let foundCategory = library.filter((item) =>
+          item.category.toLowerCase().includes(category)
+        );
+        if (foundCategory.length > 0) {
+          console.log(`Danh sách sách thuộc danh mục ${category} là: `);
+          console.table(foundCategory);
+        } else {
+          alert("Không có sách nào trong thư viện!");
+        }
+      }
+      function addBook() {
+        let id = +prompt("Nhập id cho sách mới");
+        let name = prompt("Nhập tên sách mới");
+        let price = +prompt("Nhập giá tiền");
+        let quantity = +prompt("Nhập số lượng sách");
+        let category = prompt("Nhập tên danh mục cho sách");
+        library.push({ id, name, price, quantity, category });
+        alert("Thêm thành công");
+      }
+
+      function searchBook() {
+        let option = prompt(`Nhập lựa chọn tìm kiếm:
+        1. tên
+        2. id
+        `);
+        if (option == "1") {
+          let nameBookFind = prompt(
+            "Nhập tên sách muốn tìm kiếm"
+          ).toLowerCase();
+          let foundBook = library.filter((item) =>
+            item.name.toLowerCase().includes(nameBookFind)
+          );
+          if (foundBook.length > 0) {
+            console.log("Sách cần tìm là:");
+            console.table(foundBook);
+          } else {
+            console.log("Không tìm thấy sách");
+          }
+        } else if (option == "2") {
+          let idBookFind = +prompt("Nhập id sách muốn tìm");
+          let foundId = library.find((item) => item.id === idBookFind);
+          if (foundId) {
+            console.log("Sách cần tìm là:");
+            console.table([foundId]);
+          } else {
+            console.log("Không tìm thấy sách");
+          }
+        }
+      }
+
+      function buyBook() {
+        let idBook = +prompt("Nhập id sách bạn muốn mua");
+        let findBook = library.find((item) => item.id === idBook);
+
+        if (!findBook) {
+          alert("Không tồn tại sản phẩm");
+          return;
+        }
+
+        console.log(`
+        ID: ${findBook.id}
+        Tên: ${findBook.name}
+        Giá: ${findBook.price}
+        Số lượng còn lại: ${findBook.quantity}
+        Danh mục: ${findBook.category}
+    `);
+
+        let desiredQuantity = +prompt("Nhập số lượng muốn mua");
+
+        if (desiredQuantity > findBook.quantity) {
+          alert("Không đủ số lượng sản phẩm bạn muốn");
+          return;
+        }
+
+        let bookInCart = cart.find((item) => item.id === idBook);
+        if (bookInCart) {
+          bookInCart.quantity += desiredQuantity;
+          bookInCart.total += findBook.price * desiredQuantity;
+        } else {
+          cart.push({
+            id: findBook.id,
+            name: findBook.name,
+            price: findBook.price,
+            quantity: desiredQuantity,
+            total: findBook.price * desiredQuantity,
+          });
+        }
+
+        findBook.quantity -= desiredQuantity;
+        alert("Mua hàng thành công!");
+      }
+
+      function sortLibrary() {
+        library.sort((a, b) => a.price - b.price);
+        console.log("Sách xếp theo giá tăng dần là:");
+        console.table(library);
+
+        library.sort((a, b) => b.price - a.price);
+        console.log("Sách xếp theo giá giảm dần là:");
+        console.table(library);
+      }
+
+      function totalBook() {
+        if (cart.length === 0) {
+          console.log("Giỏ hàng trống!");
+          return;
+        }
+
+        let totalAmount = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        console.log("Chi tiết giỏ hàng:");
+        console.table(cart);
+        console.log(
+          `Tổng số tiền cần thanh toán: ${totalAmount.toLocaleString()} VND`
+        );
+      }
+
+      let choice;
+
+      do {
+        choice = +prompt(`
+1. Hiển thị danh sách sách theo thể loại (Người dùng chọn thể loại để xem sách trong danh mục đó).
+2. Thêm sách mới vào kho
+3. Tìm kiếm sách theo tên hoặc id.
+4. Mua sách (Nhập id sách cần mua và số lượng, cập nhật lại kho).
+5. Sắp xếp sách theo giá:
+6. Tính tổng số lượng sách đã mua và in ra tổng tiền trong giỏ hàng
+7. Hiển thị tổng số lượng sách trong kho.
+8. Thoát chương trình.
+        `);
+
+        switch (choice) {
+          case 1:
+            displayLibrary();
+            break;
+          case 2:
+            addBook();
+            break;
+          case 3:
+            searchBook();
+            break;
+          case 4:
+            buyBook();
+            break;
+          case 5:
+            sortLibrary();
+            break;
+          case 6:
+            totalBook();
+            break;
+          case 7:
+            totalQuantity();
+            break;
+          case 8:
+            alert("Thoat chuong trinh");
+            break;
+          default:
+            break;
+        }
+      } while (choice !== 8);
+    </script>
+  </body>
+</html>
